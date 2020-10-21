@@ -6,6 +6,6 @@ Redux or other state management framework is not used as local state managment w
 
 Run `npm install` in the repository
 Run `npm run start_server` in one terminal
-Then `npm run start_cypress_tests` in another terminal
+Then `npm run cypress_tests` in another terminal
 
 Control-c once finished.

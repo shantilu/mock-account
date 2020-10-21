@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Input, InputNumber, Form, Select } from "antd";
+import { Modal, Input, InputNumber, Form, Select, message } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { currencies, currenciesType, IAccount } from "../core/models";
 import { createTransaction } from "../providers/api";
@@ -30,12 +30,20 @@ export const FundTransferModal: React.FC<FundTransferModalProps> = ({
   ...restProps
 }) => {
   const [form] = Form.useForm();
-  const [fromAccId, setFromAccID] = useState("");
-  const [toAccID, setToAccID] = useState("");
+  const [fromAccId, setFromAccID]: [string, Function] = useState("");
+  const [toAccID, setToAccID]: [string, Function] = useState("");
+  const [accountError, setAccountError]: [
+    "" | "success" | "error",
+    Function
+  ] = useState("");
 
   const handleOk = () => {
     const transData: FundTransferDataType = form.getFieldsValue();
     const { fromAcc, toAcc, amount, currency } = transData;
+
+    if (!fromAcc || !toAcc || !amount || !currency || fromAcc == toAcc) {
+      return message.error("Please fill the form with validate data");
+    }
 
     Modal.confirm({
       title: "Confirm",
@@ -51,6 +59,11 @@ export const FundTransferModal: React.FC<FundTransferModalProps> = ({
       },
     });
   };
+
+  const handleToAccount = (account_id: string) =>
+    account_id === fromAccId
+      ? setAccountError("error")
+      : (setAccountError("success"), setToAccID(account_id));
 
   return (
     <Modal
@@ -74,7 +87,10 @@ export const FundTransferModal: React.FC<FundTransferModalProps> = ({
         >
           <Select
             value={fromAccId}
-            onChange={(val: string) => setFromAccID(val)}
+            onChange={(val: string) => {
+              val === toAccID && setAccountError("error");
+              setFromAccID(val);
+            }}
           >
             {accounts.map((account: any) => (
               <Select.Option value={account.id} key={account.id}>
@@ -88,8 +104,11 @@ export const FundTransferModal: React.FC<FundTransferModalProps> = ({
           label="To Account"
           name="toAcc"
           rules={[{ required: true, message: "Please select inbound account" }]}
+          hasFeedback
+          validateStatus={accountError}
+          help="Cannot transfer to the same account"
         >
-          <Select value={toAccID} onChange={(val: string) => setToAccID(val)}>
+          <Select value={toAccID} onChange={handleToAccount}>
             {accounts.map((account: any) => (
               <Select.Option value={account.id} key={account.id}>
                 {account.type}-{account.id}

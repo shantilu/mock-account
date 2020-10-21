@@ -26,4 +26,4 @@ yarn-error.log*
 .vscode/
 .idea/
 
-cypress/intergration/examples/
+cypress/integration/examples/
