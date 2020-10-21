@@ -1,19 +1,29 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from "axios";
+
+import { HttpClient } from "./rest-client-interceptor";
 import { FundTransferDataType } from "../components/FundTransferModal";
 import { message } from "antd";
+import { ITransaction, IAccount } from "../core/models";
 
-const FetchAPI = (
-  method: "get" | "post" | "put" | "patch",
-  resource: string,
-  query_params: any,
-  data: any
-) => {
-  const url: string = "http://localhost:4000/" + resource;
-  return axios(url, { method, data });
-};
+class MainApi extends HttpClient {
+  public constructor() {
+    super("http://localhost:4000");
+  }
+
+  public getTransactions = (params: any) =>
+    this.instance.get("/transactions", { params });
+
+  public createTransaction = (body: any) =>
+    this.instance.post("/transactions", body);
+
+  public getAccounts = (params: any) =>
+    this.instance.get("/accounts", { params });
+}
 
 const handleError = (err: AxiosError) =>
   message.error(err.code || "" + " Encountered some network error ");
+
+const baseApi = new MainApi();
 
 export const loadTransactions = (
   account_id: string,
@@ -21,15 +31,13 @@ export const loadTransactions = (
   callback: Function
 ) => {
   setLoading && setLoading(true);
-  axios
-    .get("http://localhost:4000/transactions", {
-      params: { account_id },
-    })
-    .then((res: AxiosResponse) => callback(account_id, res.data))
+  baseApi
+    .getTransactions({ account_id })
+    .then((data: any) => callback(account_id, data))
     .catch(handleError);
 };
 
-export const createTransaction = async (
+export const createTransaction = (
   data: FundTransferDataType,
   displayAccount: string,
   loadCallback: Function,
@@ -48,30 +56,29 @@ export const createTransaction = async (
     type: "debit",
     ...transaction,
   };
-  try {
-    const creditRes: AxiosResponse = await axios.post(
-      "http://localhost:4000/transactions",
-      creditTransaction
-    );
-    const debitRes: AxiosResponse = await axios.post(
-      "http://localhost:4000/transactions",
-      debitTransaction
-    );
-    if (creditRes && debitRes) {
+
+  // const debitRes: AxiosResponse = await axios.post(
+  //   "http://localhost:4000/transactions",
+  //   debitTransaction
+  // );
+  baseApi.createTransaction(creditTransaction).then((creRes: any) =>
+    baseApi.createTransaction(debitTransaction).then((debRes: any) => {
       loadTransactions(displayAccount, null, loadCallback);
       callback();
-    }
-  } catch (err) {
-    // Handle Error Here
-    message.error(err);
-  }
+    })
+  );
 };
 
-export const loadAccounts = (user: string) => {
-  return axios
-    .get("http://localhost:4000/accounts", {
-      params: { user },
-    })
-    .then((res: AxiosResponse) => res.data)
-    .catch(handleError);
+export const loadAccounts = (
+  user: string,
+  setAccounts: Function,
+  loadCallback: Function
+) => {
+  baseApi.getAccounts({ user }).then((data: any) => {
+    setAccounts(data);
+    if (data.length) {
+      const defaultAccount = data[0];
+      loadTransactions(defaultAccount.id, null, loadCallback);
+    }
+  });
 };

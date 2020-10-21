@@ -30,13 +30,8 @@ function App() {
   };
 
   useEffect(() => {
-    loadAccounts(user).then((data: IAccount[]) => {
-      setAccounts(data);
-      if (data.length) {
-        const defaultAccount = data[0];
-        loadTransactions(defaultAccount.id, setLoading, loadCallback);
-      }
-    });
+    setLoading(true);
+    loadAccounts(user, setAccounts, loadCallback);
   }, []);
 
   return (
