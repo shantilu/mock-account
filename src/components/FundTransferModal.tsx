@@ -139,8 +139,8 @@ export const FundTransferModal: React.FC<FundTransferModalProps> = ({
           <InputNumber placeholder="Amount" min={1} max={20000} step={100} />
         </Form.Item>
 
-        <Form.Item name="description" label="description">
-          <Input placeholder="description" />
+        <Form.Item name="description" label="Description">
+          <Input placeholder="Description" />
         </Form.Item>
       </Form>
     </Modal>
