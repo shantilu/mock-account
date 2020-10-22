@@ -119,7 +119,7 @@ export const FundTransferModal: React.FC<FundTransferModalProps> = ({
 
         <Form.Item
           name="currency"
-          label="currency"
+          label="Currency"
           rules={[{ required: true, message: "Please select currency!" }]}
         >
           <Select style={{ width: 120 }}>
@@ -134,9 +134,9 @@ export const FundTransferModal: React.FC<FundTransferModalProps> = ({
         <Form.Item
           name="amount"
           rules={[{ required: true, message: "Please input amount!" }]}
-          label="amount"
+          label="Amount"
         >
-          <InputNumber placeholder="amount" min={1} max={20000} step={100} />
+          <InputNumber placeholder="Amount" min={1} max={20000} step={100} />
         </Form.Item>
 
         <Form.Item name="description" label="description">

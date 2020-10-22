@@ -11,7 +11,7 @@ import { loadTransactions, loadAccounts } from "./providers/api";
 const { Header, Content, Footer } = Layout;
 
 function App() {
-  const user: string = "john_doe";
+  const user: string = window.localStorage.getItem("user") || "john_doe";
   const [accounts, setAccounts]: [IAccount[], Function] = useState([]);
   const [displayAccount, setDisplayAccount]: [string | null, any] = useState(
     null

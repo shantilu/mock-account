@@ -25,7 +25,8 @@
     "eject": "react-scripts eject",
     "serve": "json-server -p 4000 db.json",
     "start_sever": "concurrently --kill-others-on-fail \"npm run start\" \"npm run serve\"",
-    "cypress_tests": "cypress open"
+    "cypress_tests": "cypress run",
+    "cypress": "cypress open"
   },
   "eslintConfig": {
     "extends": "react-app"
